@@ -1,0 +1,18 @@
+schema-version = 1
+
+[package]
+title = "Vega custom IView example (ColorBox)"
+version = "0.1.0"
+id = "com.example.customviewdemo"
+
+[components]
+[[components.interactive]]
+id = "com.example.customviewdemo.main"
+runtime-module = "/com.amazon.kepler.keplerscript.runtime.loader_2@IKeplerScript_2_0"
+launch-type = "singleton"
+categories = ["com.amazon.category.main"]
+
+# No extra [[needs.module]] / [[wants.module]] are required for a custom UI
+# component: the UI-Toolkit view/react modules are core system components, and the
+# app-provided component itself is wired by the autolink (react-native.config.js)
+# into keplerscript-app-config.json — not the manifest.
