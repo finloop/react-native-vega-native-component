@@ -1,6 +1,6 @@
 #include "ColorBoxViewManager.h"
 
-#include <syslog.h>  // device logs are syslog; surfaces in `vega device start-log-stream`
+#include <apmf/log.h>  // device logs via APMF logger; surfaces in `vega device start-log-stream`
 
 #include <string>
 
@@ -12,6 +12,9 @@
 #include <apmf/iface/com/amazon/kepler/uitoolkit/react/IFrame.h>
 
 namespace customview {
+
+using namespace apmf::log_levels;
+APMF_DEFINE_LOGGER(ColorBoxLogger, "com.example.customview");
 
 namespace gfx = apmf::iface::com::amazon::kepler::uitoolkit::graphics;
 
@@ -39,7 +42,7 @@ ColorBoxViewManager::ColorBoxViewManager(View<vw::IViewModule> viewModule)
 
 // Create the native view instance (one per <ColorBox> mounted in JS).
 Ptr<vw::IView> ColorBoxViewManager::makeView() {
-  syslog(LOG_USER | LOG_INFO, "[ColorBox] makeView");
+  APMF_LOG(ColorBoxLogger, INFO) << "[ColorBox] makeView";
   return viewModule_->makeView();
 }
 
@@ -47,7 +50,7 @@ Ptr<vw::IView> ColorBoxViewManager::makeView() {
 // validAttributes, and the values JS sends arrive in updateProps().
 Ptr<rx::IPropsRegistry> ColorBoxViewManager::registerProps(
     View<rx::IPropsRegistryBuilder> builder) {
-  syslog(LOG_USER | LOG_INFO, "[ColorBox] registerProps");
+  APMF_LOG(ColorBoxLogger, INFO) << "[ColorBox] registerProps";
   builder->stringPropWithDefault("color", "#444444");
   builder->doublePropWithDefault("opacity", 1.0);
   return builder->build();
@@ -60,11 +63,11 @@ void ColorBoxViewManager::updateProps(View<vw::IView> view, View<rx::IJsObject> 
     if (key == "color") {
       const std::string hex(props->getString("color").c_str());
       view->setBackgroundColor(parseColor(hex));
-      syslog(LOG_USER | LOG_INFO, "[ColorBox] updateProps color=%s", hex.c_str());
+      APMF_LOG(ColorBoxLogger, INFO) << "[ColorBox] updateProps color=" << hex;
     } else if (key == "opacity") {
       const float o = static_cast<float>(props->getDouble("opacity"));
       view->setOpacity(o);
-      syslog(LOG_USER | LOG_INFO, "[ColorBox] updateProps opacity=%.2f", o);
+      APMF_LOG(ColorBoxLogger, INFO) << "[ColorBox] updateProps opacity=" << o;
     }
   }
 }
@@ -73,7 +76,7 @@ void ColorBoxViewManager::updateProps(View<vw::IView> view, View<rx::IJsObject> 
 void ColorBoxViewManager::updateLayout(View<vw::IView> view, View<rx::ILayout> layout) {
   const gfx::Size size = layout->getContentFrame()->getSize();
   view->setSize(size);
-  syslog(LOG_USER | LOG_INFO, "[ColorBox] updateLayout %.0fx%.0f", size.width, size.height);
+  APMF_LOG(ColorBoxLogger, INFO) << "[ColorBox] updateLayout " << size.width << "x" << size.height;
 }
 
 }  // namespace customview

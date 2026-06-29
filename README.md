@@ -52,33 +52,10 @@ On the JS side, [`src/ColorBox.tsx`](src/ColorBox.tsx) calls
 | `CMakeLists.txt` | imports the UI-Toolkit IDL, builds the component `.so` |
 | `manifest.toml` / `app.json` | app identity (`com.example.customviewdemo`) |
 
-## The two non-obvious gotchas
-
-1. **`.so` naming = the deployment contract.** An app-provided in-process
-   component is `dlopen`'d at runtime by a filename derived from its component
-   path (`/com.example.customview` → `com.example.customview.so`), and its
-   **SONAME must equal that filename** or the APMF self-registration
-   (`ApmfRegisterDso`, run from the `.so`'s `INIT_ARRAY`) never resolves and you
-   get *"could not find component … / Unimplemented component"*. CMake makes this
-   exact with `set_target_properties(customview PROPERTIES OUTPUT_NAME
-   "com.example.customview" PREFIX "")` — a real, flat `lib/<arch>/…so`, no
-   omnikit/, no symlink. (Cross-checked against Amazon's own
-   `@amazon-devices/vega-carousel`.)
-
-2. **The UI-Toolkit IDL must be staged in the project.** The `react-native-vega`
-   in-app sysroot has no CMake config for `KeplerUI{View,React,Graphics}Interface`,
-   so the IDL trees are copied into `apmf/iface/` (the IDL importer searches the
-   project dir). See setup below.
-
 ## Setup
 
 ```bash
-npm install            # or copy node_modules from a working Vega RN project
-
-# Stage the UI-Toolkit IDL the build imports (not in the in-app sysroot):
-# copy the SDK's KeplerUI{View,React,Graphics}Interface include trees into
-#   apmf/iface/com/amazon/kepler/uitoolkit/
-# (flat <subpkg>-<Type>.idl.inc files, e.g. view-IView.idl.inc, graphics-Color.idl.inc)
+npm install
 ```
 
 ## Build / run / verify
