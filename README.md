@@ -60,20 +60,49 @@ npm install
 
 ## Build / run / verify
 
-```bash
-D=<your-device-serial>          # e.g. a Fire TV adb serial
-npx --no-install react-native build-vega --build-type Debug --target armv7
-VPKG=build/private/kepler/react-native-vega-native-component/undefined/vega/armv7/Debug/react-native-vega-native-component_armv7.vpkg
-vega device install-app -d $D -p "$VPKG"
-vega device launch-app  -d $D -a com.example.customviewdemo.main
+Build for your target — `armv7` for a physical Fire TV Stick, or the VVD
+simulator's arch (`aarch64` on Apple Silicon, `x86_64` on Intel):
 
-# logs (native code logs via syslog — surfaces here; printf/stderr/tmp do not):
-vega device start-log-stream -d $D | grep ColorBox
-# screen capture (composited layer):
-adb -s $D shell gwsi-tool-screenshooter /tmp/x.png && adb -s $D pull /tmp/x.png
+```bash
+ARCH=aarch64                    # armv7 (Fire TV) | aarch64 / x86_64 (VVD simulator)
+npx --no-install react-native build-vega --build-type Debug --target $ARCH
+VPKG=build/private/kepler/react-native-vega-native-component/undefined/vega/$ARCH/Debug/react-native-vega-native-component_${ARCH}.vpkg
 ```
 
-Targets: `armv7` (Fire TV Stick) / `aarch64` / `x86_64` (simulator).
+### Simulator (VVD)
+
+Start it with `vega virtual-device start`, then target it with the literal
+`-d Simulator` selector (or omit `-d` entirely when the VVD is the only device).
+Note: the `amazon-…` serial that `vega device list` prints is **not** accepted
+by `-d` — use `Simulator`.
+
+```bash
+vega device install-app -d Simulator -p "$VPKG"
+vega device launch-app  -d Simulator -a com.example.customviewdemo.main
+# native logs (via the APMF logger — surfaces here; printf/stderr/tmp do not):
+vega device start-log-stream -d Simulator | grep ColorBox
+
+# screenshot: gwsi-tool-screenshooter is physical-only (writes a 0-byte file on a VVD).
+# The VVD is an Android emulator, so capture via the emulator console (the raw command
+# argent's screenshot wraps). Serial is `emulator-<port>`, from `adb devices`:
+adb -s emulator-5554 emu screenrecord screenshot ./shots   # writes ./shots/Screenshot_*.png
+```
+
+### Physical Fire TV
+
+Target the serial from `vega device list`:
+
+```bash
+D=<device-serial>
+vega device install-app -d $D -p "$VPKG"
+vega device launch-app  -d $D -a com.example.customviewdemo.main
+vega device start-log-stream -d $D | grep ColorBox
+
+# screenshot: official gwsi-tool-screenshooter via the device adapter (vda):
+vega exec vda -s $D shell gwsi-tool-screenshooter /tmp/x.png && vega exec vda -s $D pull /tmp/x.png ./x.png
+```
+
+Targets: `armv7` (Fire TV Stick) / `aarch64` / `x86_64` (VVD simulator).
 
 Expected `ColorBox` log on launch:
 ```
