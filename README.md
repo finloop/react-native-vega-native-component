@@ -83,8 +83,6 @@ vega device launch-app  -d Simulator -a com.example.customviewdemo.main
 vega device start-log-stream -d Simulator | grep ColorBox
 
 # screenshot: gwsi-tool-screenshooter is physical-only (writes a 0-byte file on a VVD).
-# The VVD is an Android emulator, so capture via the emulator console (the raw command
-# argent's screenshot wraps). Serial is `emulator-<port>`, from `adb devices`:
 adb -s emulator-5554 emu screenrecord screenshot ./shots   # writes ./shots/Screenshot_*.png
 ```
 
