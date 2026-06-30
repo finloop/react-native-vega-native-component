@@ -1,5 +1,5 @@
 {
-  "name": "@amazon-devices/customviewdemo",
+  "name": "react-native-vega-native-component",
   "version": "0.0.1",
   "private": true,
   "files": ["dist"],

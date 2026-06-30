@@ -63,7 +63,7 @@ npm install
 ```bash
 D=<your-device-serial>          # e.g. a Fire TV adb serial
 npx --no-install react-native build-vega --build-type Debug --target armv7
-VPKG=build/private/kepler/@amazon-devices/customviewdemo/undefined/vega/armv7/Debug/@amazon-devices/customviewdemo_armv7.vpkg
+VPKG=build/private/kepler/react-native-vega-native-component/undefined/vega/armv7/Debug/react-native-vega-native-component_armv7.vpkg
 vega device install-app -d $D -p "$VPKG"
 vega device launch-app  -d $D -a com.example.customviewdemo.main
 
